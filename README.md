@@ -102,6 +102,39 @@ chmod +x install_env.sh
 conda activate 3dgrut
 ```
 
+### Installation Notes for Specific Environments
+
+The provided `./install_env.sh` script handles most cases. However, depending on your system's CUDA and GCC versions, you might need to adjust the command or follow specific steps. Here's a summary of a successful installation process on a system with CUDA 12.8 and GCC 11:
+
+1.  **Check CUDA Version**: Before running the script, identify your CUDA driver version:
+    ```bash
+    nvidia-smi | grep CUDA
+    ```
+    Note the CUDA version (e.g., 12.8).
+
+2.  **Check GCC Version**: Check your default GCC compiler version:
+    ```bash
+    gcc -dumpversion
+    ```
+    GCC 11 or lower is generally compatible without flags. If you have GCC > 11, you might need to install `gcc-11` and `g++-11` (`sudo apt-get install gcc-11 g++-11`) and use the `WITH_GCC11` flag as mentioned in the script's notes.
+
+3.  **Run Installation Script with Correct CUDA Version**: Grant execution permission and run the script, specifying the closest supported CUDA version via the `CUDA_VERSION` environment variable. For CUDA 12.8, use `12.8.1`:
+    ```bash
+    chmod +x install_env.sh
+    CUDA_VERSION=12.8.1 ./install_env.sh 3dgrut
+    ```
+    This creates the `3dgrut` conda environment and installs dependencies, including compiling Kaolin from source if necessary for CUDA 12.8.
+
+4.  **Activate Environment**: Always activate the created environment before running training or other commands:
+    ```bash
+    conda activate 3dgrut
+    ```
+
+5.  **Troubleshooting `ModuleNotFoundError`**: If you encounter errors like `ModuleNotFoundError: No module named 'hydra'`, double-check that you have activated the correct conda environment (`3dgrut` in this case) before running the Python command. If the error persists, try reinstalling requirements within the activated environment:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
 ### Running with Docker
 
 Build the docker image:
@@ -109,7 +142,7 @@ Build the docker image:
 git clone --recursive https://github.com/nv-tlabs/3dgrut.git
 cd 3dgrut
 docker build . -t 3dgrut
-````
+```
 
 Run it:
 ```bash
